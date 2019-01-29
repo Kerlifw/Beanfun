@@ -134,9 +134,8 @@ namespace Beanfun
                 payload.Add("t_AccountID", account);
                 payload.Add("t_Password", password);
                 payload.Add("CodeTextBox", "");
-                payload.Add("btn_login.x", "0");
-                payload.Add("btn_login.y", "0");
                 payload.Add("LBD_VCID_c_login_idpass_form_samplecaptcha", samplecaptcha);
+                payload.Add("btn_login", "登入");
 
                 //上傳並且拿取得回應結果
                 response = Encoding.UTF8.GetString(this.UploadValues("https://tw.newlogin.beanfun.com/login/id-pass_form.aspx?skey=" + sessionKey, payload));
@@ -154,6 +153,9 @@ namespace Beanfun
                 payload = new NameValueCollection();
                 payload.Add("SessionKey", sessionKey);
                 payload.Add("AuthKey", authKey);
+                payload.Add("ServiceCode", "");
+                payload.Add("ServiceRegion", "");
+                payload.Add("ServiceAccountSN", "0");
 
                 //上傳並且拿取得回應結果
                 response = Encoding.UTF8.GetString(this.UploadValues("https://tw.beanfun.com/beanfun_block/bflogin/return.aspx", payload));
@@ -239,10 +241,10 @@ namespace Beanfun
 
                 //不知用意
                 System.Net.ServicePointManager.Expect100Continue = false;
-                response = Encoding.UTF8.GetString(this.UploadValues("https://tw.new.beanfun.com/beanfun_block/generic_handlers/record_service_start.ashx", payload));
+                response = Encoding.UTF8.GetString(this.UploadValues("https://tw.beanfun.com/beanfun_block/generic_handlers/record_service_start.ashx", payload));
 
-                response = this.DownloadString("https://tw.new.beanfun.com/generic_handlers/get_result.ashx?meth=GetResultByLongPolling&key=" + longPollingKey + "&_=" + GetCurrentTime());
-                response = this.DownloadString("https://tw.new.beanfun.com/beanfun_block/generic_handlers/get_webstart_otp.ashx?SN=" + longPollingKey + "&WebToken=" + this.webtoken + "&SecretCode=" + secretCode + "&ppppp=FE40250C435D81475BF8F8009348B2D7F56A5FFB163A12170AD615BBA534B932&ServiceCode=" + service_code + "&ServiceRegion=" + service_region + "&ServiceAccount=" + account.sacc + "&CreateTime=" + account.screatetime.Replace(" ", "%20"));
+                response = this.DownloadString("https://tw.beanfun.com/generic_handlers/get_result.ashx?meth=GetResultByLongPolling&key=" + longPollingKey + "&_=" + GetCurrentTime());
+                response = this.DownloadString("https://tw.beanfun.com/beanfun_block/generic_handlers/get_webstart_otp.ashx?SN=" + longPollingKey + "&WebToken=" + this.webtoken + "&SecretCode=" + secretCode + "&ppppp=FE40250C435D81475BF8F8009348B2D7F56A5FFB163A12170AD615BBA534B932&ServiceCode=" + service_code + "&ServiceRegion=" + service_region + "&ServiceAccount=" + account.sacc + "&CreateTime=" + account.screatetime.Replace(" ", "%20"));
                 response = response.Substring(2);
                 string key = response.Substring(0, 8); //取得鑰匙
                 string plain = response.Substring(8); //取得密碼
@@ -357,7 +359,7 @@ namespace Beanfun
         protected override WebRequest GetWebRequest(Uri address)
         {
             WebRequest webRequest = base.GetWebRequest(address);
-            webRequest.Timeout = 1000;
+            webRequest.Timeout = 30000;
             HttpWebRequest httpRequest = webRequest as HttpWebRequest;
 
             if (httpRequest != null)
